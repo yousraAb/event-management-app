@@ -4,62 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Event::with('host')->withCount('participants')->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'date' => 'required|date',
+            'location' => 'required|string',
+            'max_participants' => 'required|integer|min:1',
+        ]);
+
+        $event = Event::create([
+            ...$validated,
+            'host_id' => Auth::id(),
+        ]);
+
+        return response()->json($event, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Event $event)
     {
-        //
+        return $event->load('host', 'participants.user');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Event $event)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Event $event)
     {
-        //
+        if ($event->host_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'string',
+            'date' => 'date',
+            'location' => 'string',
+            'max_participants' => 'integer|min:1',
+        ]);
+
+        $event->update($validated);
+        return response()->json($event);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Event $event)
     {
-        //
+        if ($event->host_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $event->delete();
+        return response()->json(['message' => 'Event deleted']);
     }
 }
