@@ -180,7 +180,8 @@ const Leftbar = (props: LeftbarProps) => {
             <AccountCircle fontSize="large" color="action" sx={{ mr: 1 }} />
             <Box>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {user.email}
+                {user.name}
+                {/* {user.email} */}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 {user.rolesNames[0]}

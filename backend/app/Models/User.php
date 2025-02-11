@@ -30,6 +30,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     public static $cacheKey = 'users';
 
     protected $fillable = [
+        'name',
         'email',
         'password',
     ];
@@ -214,6 +215,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             ],
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string',
+            'name' => 'required|string',
         ];
         if ($id !== null) {
             $rules['email'] .= ','.$id;
