@@ -15,6 +15,7 @@ const RegisterForm = () => {
   const { register } = useAuth();
 
   const RegisterSchema = Yup.object().shape({
+    name: Yup.string().max(255, 'Le champ est trop long.').required('Le champ est obligatoire'),
     email: Yup.string()
       .email("Le format de l'email est incorrect")
       .max(191, 'Le champ est trop long.')
@@ -33,6 +34,7 @@ const RegisterForm = () => {
   const onSubmit = async (data: RegisterInput) => {
     await register(
       {
+        name: data.name, // Add name to request
         email: data.email,
         password: data.password,
       },
@@ -56,6 +58,9 @@ const RegisterForm = () => {
       <Card sx={{ maxWidth: '450px', margin: 'auto' }}>
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={4} sx={{ padding: 5 }}>
+          <Grid item xs={12}>
+              <RHFTextField name="name" label="Nom" /> {/* Add Name Field */}
+            </Grid>
             <Grid item xs={12}>
               <RHFTextField name="email" label="Email" />
             </Grid>

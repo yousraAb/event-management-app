@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -77,6 +78,19 @@ Route::middleware('auth:api')->group(
         );
     }
 );
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/events', [EventController::class, 'index']);
+    Route::post('/events', [EventController::class, 'store']);
+    Route::get('/events/{event}', [EventController::class, 'show']);
+    Route::put('/events/{event}', [EventController::class, 'update']);
+    Route::delete('/events/{event}', [EventController::class, 'destroy']);
+
+    // Join/Leave Event
+    Route::post('/events/{event}/join', [EventController::class, 'joinEvent']);
+    Route::delete('/events/{event}/leave', [EventController::class, 'leaveEvent']);
+});
+
 
 Route::get(
     '/hello', function () {
