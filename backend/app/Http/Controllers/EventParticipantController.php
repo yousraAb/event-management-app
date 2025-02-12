@@ -1,65 +1,35 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Event;
 use App\Models\EventParticipant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventParticipantController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function joinEvent(Event $event)
     {
-        //
+        if ($event->participants()->count() >= $event->max_participants) {
+            return response()->json(['message' => 'Event is full'], 400);
+        }
+
+        if (EventParticipant::where('event_id', $event->id)->where('user_id', Auth::id())->exists()) {
+            return response()->json(['message' => 'Already joined'], 400);
+        }
+
+        EventParticipant::create([
+            'event_id' => $event->id,
+            'user_id' => Auth::id(),
+        ]);
+
+        return response()->json(['message' => 'Joined successfully']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function leaveEvent(Event $event)
     {
-        //
-    }
+        EventParticipant::where('event_id', $event->id)->where('user_id', Auth::id())->delete();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(EventParticipant $eventParticipant)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(EventParticipant $eventParticipant)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, EventParticipant $eventParticipant)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(EventParticipant $eventParticipant)
-    {
-        //
+        return response()->json(['message' => 'Left the event']);
     }
 }

@@ -5,7 +5,7 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\EventParticipantController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -80,17 +80,27 @@ Route::middleware('auth:api')->group(
 );
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/events', [EventController::class, 'index']);
-    Route::post('/events', [EventController::class, 'store']);
-    Route::get('/events/{event}', [EventController::class, 'show']);
-    Route::put('/events/{event}', [EventController::class, 'update']);
-    Route::delete('/events/{event}', [EventController::class, 'destroy']);
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::controller(EventController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{event}', 'show');
+            Route::put('/{event}', 'update');
+            Route::delete('/{event}', 'destroy');
+            Route::post('/{event}/join', 'joinEvent');
+            Route::delete('/{event}/leave', 'leaveEvent');
+        });
+    });
 
-    // Join/Leave Event
-    Route::post('/events/{event}/join', [EventController::class, 'joinEvent']);
-    Route::delete('/events/{event}/leave', [EventController::class, 'leaveEvent']);
+    Route::prefix('eventsparticipants')->name('eventsparticipants.')->group(function () {
+        Route::controller(EventParticipantController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{id}', 'show');
+            Route::delete('/{id}', 'destroy');
+        });
+    });
 });
-
 
 Route::get(
     '/hello', function () {

@@ -58,6 +58,7 @@ const Leftbar = (props: LeftbarProps) => {
     setSubNavItems([]);
   };
 
+
   const isMobile = !useMediaQuery(theme.breakpoints.up('sm'));
   const toggleLeftbar = () => {
     const newOpen = !open;

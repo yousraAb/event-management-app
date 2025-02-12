@@ -33,15 +33,40 @@ const LoginForm = () => {
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
+
   const onSubmit = async (data: LoginInput) => {
-    await login(
-      {
-        email: data.email,
-        password: data.password,
-      },
-      { displayProgress: true, displaySuccess: true }
-    );
+    try {
+      const response = await login(
+        {
+          email: data.email,
+          password: data.password,
+        },
+        { displayProgress: true, displaySuccess: true }
+      );
+  
+      console.log("Login Response:", response); // Debugging
+  
+      // Check if response contains the token
+      if (response && typeof response === "object") {
+        localStorage.setItem("access_token", JSON.stringify(response)); 
+        console.log("Stored Token:", localStorage.getItem("access_token"));
+      } else {
+        console.error("Unexpected login response format:", response);
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+    }
   };
+  
+  // const onSubmit = async (data: LoginInput) => {
+  //   await login(
+  //     {
+  //       email: data.email,
+  //       password: data.password,
+  //     },
+  //     { displayProgress: true, displaySuccess: true }
+  //   );
+  // };
   return (
     <>
       <Typography
