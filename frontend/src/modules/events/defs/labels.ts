@@ -1,9 +1,9 @@
 import { CrudLabels } from '@common/defs/types';
 
 const EventLabels: CrudLabels = {
-  CreateNewOne: 'event.create_new_one',
+  CreateNewOne: 'Create Event',
   NewOne: 'event.new_one',
-  ReadAll: 'event.read_all',
+  ReadAll: 'list',
   Items: 'event.items',
   EditOne: 'event.edit_one',
 };

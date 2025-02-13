@@ -9,5 +9,5 @@ export interface Events extends CrudObject {
   location: string;
   max_participants: number;
   host_id: Id; // The ID of the host user (if applicable)
-  host?: User; // Optionally include host user information
+  // host?: User; // Optionally include host user information
 }

@@ -3,8 +3,8 @@ import { CrudApiRoutes } from '@common/defs/types';
 const prefix = '/events';
 
 const ApiRoutes: CrudApiRoutes = {
-  CreateOne: prefix,
-  ReadAll: prefix,
+  ReadAll: '/events',
+  CreateOne: prefix + '/create',
   ReadOne: prefix + '/{id}',
   UpdateOne: prefix + '/{id}',
   DeleteOne: prefix + '/{id}',

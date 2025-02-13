@@ -57,6 +57,11 @@ const Topbar = () => {
       onClick: () => router.push(Routes.Common.Home),
     },
     {
+      label: 'Events',
+      link: Routes.Events.ReadAll,
+      onClick: () => router.push(Routes.Events.ReadAll),
+    },
+    {
       label: t('topbar:language'),
       dropdown: [
         {
@@ -88,8 +93,10 @@ const Topbar = () => {
           label: 'Déconnexion',
           onClick: () => logout(),
         },
+        
       ],
     },
+   
   ];
 
   const toggleDropdown = () => {

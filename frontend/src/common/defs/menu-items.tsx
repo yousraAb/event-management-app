@@ -22,13 +22,33 @@ export const menuItems: NavGroup[] = [
         routes: Routes.Users,
       },
       {
-        text: 'Events',  // New Events Module
-        icon: <Event />,  // Use an event-related icon
-        link: Routes.Events.ReadAll,  // Ensure this route exists
+        text: 'Events',
+        icon: <Event />,
+        link: Routes.Events.ReadAll,
         namespace: Namespaces.Events,
         permission: CRUD_ACTION.READ,
         routes: Routes.Events,
+        children: [
+          {
+            text: 'Create Event',
+            icon: <Event />,
+            link: Routes.Events.ReadAll,
+          },
+          {
+            text: 'Event Listing',
+            icon: <Event />,
+            link: Routes.Events.ReadAll,  // Ensure this route exists
+            permission: CRUD_ACTION.READ,
+          },
+          {
+            text: 'Events Table',
+            icon: <Event />,
+            link: Routes.Events.ReadAll,  // Ensure this route exists
+            permission: CRUD_ACTION.READ,
+          },
+        ],
       },
     ],
   },
 ];
+

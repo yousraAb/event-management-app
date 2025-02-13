@@ -1,6 +1,5 @@
 import ApiRoutes from '@common/defs/api-routes';
 import useItems, { UseItems, UseItemsOptions, defaultOptions } from '@common/hooks/useItems';
-import { User } from '@modules/users/defs/types';
 import { Events } from '@modules/events/defs/types';
 
 export interface CreateOneInput {
@@ -22,8 +21,6 @@ export interface UpdateOneInput {
 
 export type UpsertOneInput = CreateOneInput | UpdateOneInput;
 
-
-
 const useEvents: UseItems<Events, CreateOneInput, UpdateOneInput> = (
   opts: UseItemsOptions = defaultOptions
 ) => {
@@ -33,4 +30,3 @@ const useEvents: UseItems<Events, CreateOneInput, UpdateOneInput> = (
 };
 
 export default useEvents;
-
