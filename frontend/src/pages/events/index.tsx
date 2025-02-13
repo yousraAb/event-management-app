@@ -1,8 +1,7 @@
 import withAuth, { AUTH_MODE } from '@modules/auth/hocs/withAuth';
-import withPermissions from '@modules/permissions/hocs/withPermissions';
 import { NextPage } from 'next';
 import Routes from '@common/defs/routes';
-import EventsTable from '@modules/events/components/pages/EventsTable';
+import EventListing from '@modules/events/components/pages/EventListing';
 import CustomBreadcrumbs from '@common/components/lib/navigation/CustomBreadCrumbs';
 import { useRouter } from 'next/router';
 import { Add } from '@mui/icons-material';
@@ -37,7 +36,7 @@ const EventsPage: NextPage = () => {
           { name: t(`event:${Labels.Events.Items}`) },
         ]}
       />
-      <EventsTable />
+      <EventListing />
     </>
   );
 };
@@ -48,16 +47,7 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
   },
 });
 
-export default withAuth(
-  withPermissions(EventsPage, {
-    requiredPermissions: {
-      entity: Namespaces.Events,
-      action: CRUD_ACTION.READ,
-    },
-    redirectUrl: Routes.Permissions.Forbidden,
-  }),
-  {
-    mode: AUTH_MODE.LOGGED_IN,
-    redirectUrl: Routes.Auth.Login,
-  }
-);
+export default withAuth(EventsPage, {
+  mode: AUTH_MODE.LOGGED_IN,
+  redirectUrl: Routes.Auth.Login,
+});
