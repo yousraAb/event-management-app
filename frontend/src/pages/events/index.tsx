@@ -26,7 +26,7 @@ const EventsPage: NextPage = () => {
           onClick: () => router.push(Routes.Events.CreateOne),
           permission: {
             entity: Namespaces.Events,
-            action: CRUD_ACTION.CREATE,
+            action: CRUD_ACTION.READ,
           },
         }}
       />
@@ -47,7 +47,8 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
   },
 });
 
-export default withAuth(EventsPage, {
-  mode: AUTH_MODE.LOGGED_IN,
-  redirectUrl: Routes.Auth.Login,
-});
+export default EventsPage;
+// export default withAuth(EventsPage, {
+//   mode: AUTH_MODE.LOGGED_IN,
+//   redirectUrl: Routes.Auth.Login,
+// });

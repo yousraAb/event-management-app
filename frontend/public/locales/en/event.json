@@ -1,0 +1,50 @@
+{
+    "title": "Discover Exciting Events",
+  "sub_title": "Join engaging workshops, meetups, and activities happening near you!",
+    "create_event": "Create Event",
+    "edit_event": "Edit Event",
+    "delete_event": "Delete Event",
+    "view_event": "View Event",
+    "event_details": "Event Details",
+    "event_explore": "Explore Event plus",
+
+    "event_upcoming": "Upcoming",
+    "event_ongoing": "Ongoing",
+    "event_completed": "Completed",
+    "event_canceled": "Canceled",
+    "event_postponed": "Postponed",
+
+    "event_date": "Event Date",
+    "event_time": "Event Time",
+    "event_start_time": "Start Time",
+    "event_end_time": "End Time",
+    "event_duration": "Duration",
+    "event_timezone": "Time Zone",
+
+    "event_attendees": "Attendees",
+    "event_participants": "Participants",
+    "event_invite": "Invite",
+    "event_invited": "Invited",
+    "event_rsvp": "RSVP",
+    "event_registered": "Registered",
+    "event_check_in": "Check-in",
+    "event_guest_list": "Guest List",
+  
+    "event_reminder": "Reminder",
+    "event_notification": "Notification",
+    "event_email_reminder": "Email Reminder",
+    "event_sms_reminder": "SMS Reminder",
+    "event_push_notification": "Push Notification",
+
+    "event_register": "Register",
+    "event_cancel_registration": "Cancel Registration",
+    "event_join": "Join Event",
+    "event_leave": "Leave Event",
+    "event_share": "Share Event",
+    "event_save": "Save Event",
+    "event_report": "Report Event"
+
+
+  }
+
+    

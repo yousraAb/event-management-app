@@ -1,6 +1,7 @@
+// useEvent.ts
 import ApiRoutes from '@common/defs/api-routes';
 import useItems, { UseItems, UseItemsOptions, defaultOptions } from '@common/hooks/useItems';
-import { Events } from '@modules/events/defs/types';
+import { Event } from '@modules/events/defs/types';
 
 export interface CreateOneInput {
   title: string;
@@ -8,6 +9,8 @@ export interface CreateOneInput {
   location: string;
   max_participants: number;
   host_id: number;
+  description: string; // Add description property
+  image: string; // Add image property
 }
 
 export interface UpdateOneInput {
@@ -17,16 +20,18 @@ export interface UpdateOneInput {
   location?: string;
   max_participants?: number;
   host_id?: number;
+  description?: string; // Add description property
+  image?: string; // Add image property
 }
 
 export type UpsertOneInput = CreateOneInput | UpdateOneInput;
 
-const useEvents: UseItems<Events, CreateOneInput, UpdateOneInput> = (
+const useEvent: UseItems<Event, CreateOneInput, UpdateOneInput> = (
   opts: UseItemsOptions = defaultOptions
 ) => {
   const apiRoutes = ApiRoutes.Events;
-  const useItemsHook = useItems<Events, CreateOneInput, UpdateOneInput>(apiRoutes, opts);
+  const useItemsHook = useItems<Event, CreateOneInput, UpdateOneInput>(apiRoutes, opts);
   return useItemsHook;
 };
 
-export default useEvents;
+export default useEvent;

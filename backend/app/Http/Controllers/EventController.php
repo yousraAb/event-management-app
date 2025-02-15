@@ -5,41 +5,78 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-class EventController extends Controller
+use Illuminate\Support\Facades\Storage;
+use Log;
+
+class EventController extends CrudController
 {
-    public function index()
+    protected $table = 'events';
+
+    protected $modelClass = Event::class;
+
+    protected function getTable()
+    {
+        return $this->table;
+    }
+
+    protected function getModelClass()
+    {
+        return $this->modelClass;
+    }
+
+    public function readAll(Request $request)
     {
         $events = Event::with('host')->get();
         return response()->json(['success' => true, 'events' => $events]);
     }
 
-    /**
-     * Store a newly created event.
-     */
-    public function store(Request $request)
+   
+    public function createOne(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string|max:255',
-            'max_participants' => 'required|integer|min:1',
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'date' => 'required|date',
+                'location' => 'required|string|max:255',
+                'max_participants' => 'required|integer|min:1',
+                'description' => 'required|string|min:1',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        $event = Event::create([
-            'title' => $request->title,
-            'date' => $request->date,
-            'location' => $request->location,
-            'max_participants' => $request->max_participants,
-            'host_id' => Auth::id(), // Assign current user as host
-        ]);
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('event_images', 'public');
+                $request->merge(['image' => $imagePath]);
+            }
 
-        return response()->json(['success' => true, 'event' => $event], 201);
+            // Assign current user as host
+            $request->merge(['host_id' => Auth::id()]);
+
+            return parent::createOne($request);
+        } catch (\Exception $e) {
+            Log::error('Error in EventController.createOne: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+
+            return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]], 500);
+        }
+    }
+
+    public function afterCreateOne($event, $request)
+    {
+        try {
+            Log::info('Event created successfully with ID: ' . $event->id);
+        } catch (\Exception $e) {
+            Log::error('Error in EventController.afterCreateOne: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+
+            return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]], 500);
+        }
     }
 
     /**
      * Display the specified event.
      */
-    public function show($id)
+    public function readOne($id, Request $request)
     {
         $event = Event::with(['host', 'participants'])->find($id);
 
@@ -47,13 +84,17 @@ class EventController extends Controller
             return response()->json(['success' => false, 'message' => 'Event not found'], 404);
         }
 
-        return response()->json(['success' => true, 'event' => $event]);
+        return response()->json([
+            'success' => true,
+            'event' => $event,
+            'participant_count' => $event->participants->count()
+        ]);
     }
 
     /**
      * Update an event.
      */
-    public function update(Request $request, $id)
+    public function updateOne($id, Request $request)
     {
         $event = Event::find($id);
 
@@ -71,9 +112,17 @@ class EventController extends Controller
             'date' => 'sometimes|required|date',
             'location' => 'sometimes|required|string|max:255',
             'max_participants' => 'sometimes|required|integer|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $event->update($request->all());
+        if ($request->hasFile('image')) {
+            if ($event->image) {
+                Storage::disk('public')->delete($event->image);
+            }
+            $event->image = $request->file('image')->store('event_images', 'public');
+        }
+
+        $event->update($request->except('image'));
 
         return response()->json(['success' => true, 'event' => $event]);
     }
@@ -81,7 +130,7 @@ class EventController extends Controller
     /**
      * Remove an event.
      */
-    public function destroy($id)
+    public function deleteOne($id, Request $request)
     {
         $event = Event::find($id);
 
@@ -92,6 +141,10 @@ class EventController extends Controller
         // Only the host can delete the event
         if ($event->host_id !== Auth::id()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        if ($event->image) {
+            Storage::disk('public')->delete($event->image);
         }
 
         $event->delete();
