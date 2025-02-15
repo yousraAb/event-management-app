@@ -26,26 +26,26 @@ export const menuItems: NavGroup[] = [
         icon: <Event />,
         link: Routes.Events.ReadAll,
         namespace: Namespaces.Events,
-        permission: CRUD_ACTION.READ,
+        // permission: CRUD_ACTION.READ,
         routes: Routes.Events,
         children: [
           {
             text: 'Create Event',
             icon: <Event />,
-            link: Routes.Events.ReadAll,
+            link: Routes.Events.CreateOne,
+            permission: CRUD_ACTION.READ,
           },
           {
             text: 'Event Listing',
             icon: <Event />,
             link: Routes.Events.ReadAll,  // Ensure this route exists
-            permission: CRUD_ACTION.READ,
           },
-          {
-            text: 'Events Table',
-            icon: <Event />,
-            link: Routes.Events.ReadAll,  // Ensure this route exists
-            permission: CRUD_ACTION.READ,
-          },
+          // {
+          //   text: 'Events Table',
+          //   icon: <Event />,
+          //   link: Routes.Events.ReadAll,  // Ensure this route exists
+          //   permission: CRUD_ACTION.READ,
+          // },
         ],
       },
     ],

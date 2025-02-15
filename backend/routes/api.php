@@ -79,18 +79,22 @@ Route::middleware('auth:api')->group(
     }
 );
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::prefix('events')->name('events.')->group(function () {
-        Route::controller(EventController::class)->group(function () {
-            Route::get('/', 'index');
-            Route::post('/', 'store');
-            Route::get('/{event}', 'show');
-            Route::put('/{event}', 'update');
-            Route::delete('/{event}', 'destroy');
-            Route::post('/{event}/join', 'joinEvent');
-            Route::delete('/{event}/leave', 'leaveEvent');
+Route::prefix('events')->name('events.')->group(function () {
+    Route::controller(EventController::class)->group(function () {
+        // Public route for reading all events
+        Route::get('/', 'readAll');
+        Route::get('/{id}', 'readOne');
+        
+        // Authenticated routes
+        Route::middleware(['auth:sanctum'])->group(function () {
+            Route::post('/', 'createOne');
+            Route::put('/{id}', 'updateOne');
+            Route::delete('/{id}', 'deleteOne');
+            Route::post('/{id}/join', 'joinEvent');
+            Route::delete('/{id}/leave', 'leaveEvent');
         });
     });
+
 
     Route::prefix('eventsparticipants')->name('eventsparticipants.')->group(function () {
         Route::controller(EventParticipantController::class)->group(function () {

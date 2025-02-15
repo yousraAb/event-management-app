@@ -4,8 +4,8 @@ const prefix = '/events';
 
 const ApiRoutes: CrudApiRoutes = {
   ReadAll: '/events',
-  CreateOne: prefix + '/create',
-  ReadOne: prefix + '/{id}',
+  CreateOne: prefix ,
+  ReadOne: '/events/{id}',
   UpdateOne: prefix + '/{id}',
   DeleteOne: prefix + '/{id}',
 };

@@ -1,6 +1,6 @@
 import Routes from '@common/defs/routes';
 import ItemsTable from '@common/components/partials/ItemsTable';
-import { Events } from '@modules/events/defs/types'; // Adjust import based on your Event type
+import { Event } from '@modules/events/defs/types'; // Adjust import based on your Event type
 import useEvents, { CreateOneInput, UpdateOneInput } from '@modules/events/hooks/api/useEvents'; // Adjust the hook
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -48,7 +48,7 @@ const EventsTable = () => {
     setTranslatedColumns(columns);
   }, [t, i18n.language]);
 
-  const itemToRow = (item: Events): Row => {
+  const itemToRow = (item: Event): Row => {
     return {
       id: item.id,
       name: item.name,
@@ -58,7 +58,7 @@ const EventsTable = () => {
 
   return (
     <>
-      <ItemsTable<Events, CreateOneInput, UpdateOneInput, Row>
+      <ItemsTable<Event, CreateOneInput, UpdateOneInput, Row>
         namespace={Namespaces.Events}
         routes={Routes.Events}
         useItems={useEvents} // Ensure you have this hook defined
