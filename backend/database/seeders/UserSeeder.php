@@ -15,28 +15,40 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-
         if (env('APP_ENV') === 'prod') {
             $admin = User::firstOrCreate(
                 ['email' => 'admin@cysc.fr'],
-                ['password' => bcrypt('fnFPB3TzGWTBoLA')],
+                [
+                    'name' => 'Admin',
+                    'password' => bcrypt('fnFPB3TzGWTBoLA'),
+                ]
             );
             $admin->assignRole(ROLE::ADMIN);
 
             $user = User::firstOrCreate(
                 ['email' => 'user@cysc.fr'],
-                ['password' => bcrypt('nRapnRYRdxcE')],
+                [
+                    'name' => 'User', 
+                    'password' => bcrypt('nRapnRYRdxcE'),
+                ]
             );
             $user->assignRole(ROLE::USER);
         } else {
             $admin = User::firstOrCreate(
                 ['email' => 'admin@cysc.fr'],
-                ['password' => bcrypt('admin')],
+                [
+                    'name' => 'Admin', 
+                    'password' => bcrypt('admin'),
+                ]
             );
             $admin->assignRole(ROLE::ADMIN);
+
             $user = User::firstOrCreate(
                 ['email' => 'user@cysc.fr'],
-                ['password' => bcrypt('user')],
+                [
+                    'name' => 'User', 
+                    'password' => bcrypt('user'),
+                ]
             );
             $user->assignRole(ROLE::USER);
         }

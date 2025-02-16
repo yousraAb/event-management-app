@@ -9,7 +9,7 @@ class Event extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'date', 'location', 'max_participants', 'participants_count', 'host_id', 'description', 'image'];
+    protected $fillable = ['title', 'date', 'location', 'max_participants', 'host_id', 'description', 'image', 'participants_count'];
 
 
     protected $casts = [
@@ -28,4 +28,7 @@ class Event extends Model
     {
         return $this->hasMany(\App\Models\EventParticipant::class, 'event_id');
     }
+
+
+  
 }

@@ -1,128 +1,207 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, Grid, TextField, Button, Box, InputLabel, MenuItem } from '@mui/material';
-import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-import useApi from '@common/hooks/useApi';
-import useAuth from '@modules/auth/hooks/api/useAuth';
-import Routes from '@common/defs/routes';
+// import { RHFTextField } from '@common/components/lib/react-hook-form';
+// import CreateCrudItemForm from '@common/components/partials/CreateCrudItemForm';
+// import Routes from '@common/defs/routes';
+// import { ItemResponse } from '@common/hooks/useItems';
+// import { Event } from '@modules/events/defs/types';
+// import useEvents, { CreateOneInput } from '@modules/events/hooks/api/useEvents';
+// import { Grid } from '@mui/material';
+// import { useRouter } from 'next/router';
+// import { UseFormReturn } from 'react-hook-form';
+// import useAuth from '@modules/auth/hooks/api/useAuth';
+
+// import * as Yup from 'yup';
+
+// const EventForm = () => {
+//   const router = useRouter();
+//   const { user } = useAuth();
+//   const EventSchema = Yup.object().shape({
+//     title: Yup.string().max(255, 'Le titre est trop long.').required('Le titre est obligatoire'),
+//     date: Yup.string().required('La date est obligatoire'),
+//     location: Yup.string()
+//       .max(255, 'L\'emplacement est trop long.')
+//       .required('L\'emplacement est obligatoire'),
+//     max_participants: Yup.number()
+//       .min(1, 'Doit être au moins 1')
+//       .required('Le nombre maximal de participants est obligatoire'),
+//     description: Yup.string().max(500, 'La description est trop longue.').required('La description est obligatoire'),
+//     image: Yup.mixed()
+//     .nullable()
+//     .test('fileSize', 'L\'image est trop volumineuse (max 5MB)', (value) => {
+//       return !value || (value && value.size <= 5 * 1024 * 1024);
+//     }),
+//   host_id: Yup.number()
+//     .required('L\'ID de l\'hôte est obligatoire')
+//   });
+
+//   const defaultValues: CreateOneInput = {
+//     title: '',
+//     date: '',
+//     location: '',
+//     max_participants: 1,
+//     description: '',
+//     image: null,
+//     host_id: user?.id || 0,
+//   };
+
+//   const onPostSubmit = async (
+//     _data: CreateOneInput,
+//     response: ItemResponse<Event>,
+//     _methods: UseFormReturn<CreateOneInput>
+//   ) => {
+//     if (response.success) {
+//       router.push(Routes.Events.ReadAll);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <CreateCrudItemForm<Event, CreateOneInput>
+//         routes={Routes.Events}
+//         useItems={useEvents}
+//         schema={EventSchema}
+//         defaultValues={defaultValues}
+//         onPostSubmit={onPostSubmit}
+//       >
+//         <Grid container spacing={3} sx={{ padding: 6 }}>
+//           <Grid item xs={6}>
+//             <RHFTextField name="title" label="Titre de l'événement" />
+//           </Grid>
+//           <Grid item xs={6}>
+//             <RHFTextField name="date" label="Date" type="datetime-local" InputLabelProps={{ shrink: true }} />
+//           </Grid>
+//           <Grid item xs={6}>
+//             <RHFTextField name="location" label="Emplacement" />
+//           </Grid>
+//           <Grid item xs={6}>
+//             <RHFTextField name="max_participants" label="Nombre max de participants" type="number" />
+//           </Grid>
+//           <Grid item xs={12}>
+//             <RHFTextField name="description" label="Description" multiline rows={4} />
+//           </Grid>
+//           <Grid item xs={12}>
+//             <input 
+//               type="file"
+//               name="image"
+//               accept="image/*"
+//               onChange={(e) => {
+//                 const file = e.target.files ? e.target.files[0] : null;
+//                 // Handle file setting logic (could use React Hook Form setValue for the file)
+//                 console.log(file);
+//               }}
+//             />
+//           </Grid>
+//         </Grid>
+//       </CreateCrudItemForm>
+//     </>
+//   );
+// };
+
+// export default EventForm;
+import { RHFTextField } from '@common/components/lib/react-hook-form';
 import CreateCrudItemForm from '@common/components/partials/CreateCrudItemForm';
-import { RHFTextField, RHFSelect } from '@common/components/lib/react-hook-form';
+import Routes from '@common/defs/routes';
+import { ItemResponse } from '@common/hooks/useItems';
 import { Event } from '@modules/events/defs/types';
 import useEvents, { CreateOneInput } from '@modules/events/hooks/api/useEvents';
+import { Grid } from '@mui/material';
+import { useRouter } from 'next/router';
+import { UseFormReturn } from 'react-hook-form';
+import useAuth from '@modules/auth/hooks/api/useAuth';
+import * as Yup from 'yup';
+import useUploads from '@modules/uploads/hooks/api/useUploads';
+import { Upload } from '@modules/uploads/defs/types';
 
-const schema = Yup.object().shape({
-  title: Yup.string().required('Le titre est obligatoire'),
-  date: Yup.date().required('La date est obligatoire'),
-  location: Yup.string().required('Le lieu est obligatoire'),
-  maxParticipants: Yup.number().min(1, 'Au moins un participant est requis').required('Ce champ est obligatoire'),
-  description: Yup.string().required('La description est obligatoire'),
-  image: Yup.mixed().nullable(),
-});
-
-const CreateEvent: React.FC = () => {
+const EventForm = () => {
   const router = useRouter();
-  const fetchApi = useApi();
   const { user } = useAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const { createOne: uploadFile } = useUploads();
 
-  useEffect(() => {
-    if (user) setIsAuthenticated(true);
-  }, [user]);
+  const EventSchema = Yup.object().shape({
+    title: Yup.string().max(255, 'Le titre est trop long.').required('Le titre est obligatoire'),
+    date: Yup.string().required('La date est obligatoire'),
+    location: Yup.string()
+      .max(255, 'L\'emplacement est trop long.')
+      .required('L\'emplacement est obligatoire'),
+    max_participants: Yup.number()
+      .min(1, 'Doit être au moins 1')
+      .required('Le nombre maximal de participants est obligatoire'),
+    description: Yup.string().max(500, 'La description est trop longue.').required('La description est obligatoire'),
+    image: Yup.mixed()
+      .nullable()
+      .test('fileSize', 'L\'image est trop volumineuse (max 5MB)', (value) => {
+        return !value || (value && value.size <= 5 * 1024 * 1024);
+      }),
+    host_id: Yup.number().required('L\'ID de l\'hôte est obligatoire'),
+  });
 
-  const defaultValues = {
+  const defaultValues: CreateOneInput = {
     title: '',
     date: '',
     location: '',
-    maxParticipants: 10,
+    max_participants: 1,
     description: '',
     image: null,
+    host_id: user?.id || 0,
   };
 
-  const { handleSubmit, control, setValue } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues,
-  });
-
-  const onPostSubmit = async (data: any) => {
-    if (!isAuthenticated) {
-      router.push(Routes.Auth.Login);
-      return;
+  const onPostSubmit = async (
+    _data: CreateOneInput,
+    response: ItemResponse<Event>,
+    _methods: UseFormReturn<CreateOneInput>
+  ) => {
+    if (response.success) {
+      router.push(Routes.Events.ReadAll);
     }
-    
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (value) formData.append(key, value);
-    });
+  };
 
-    try {
-      const response = await fetchApi<{ success: boolean; message: string }>('/api/events', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.success) {
-        router.push(Routes.Events.ReadAll);
-      } else {
-        console.error(response.message);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      const uploadResponse = await uploadFile({ file });
+      if (uploadResponse.success) {
+        // Handle successful upload, such as storing the file ID or URL in the form data
+        console.log('Uploaded file:', uploadResponse.data?.item);
       }
-    } catch (error) {
-      console.error('Error creating event', error);
     }
   };
 
   return (
     <>
-    <CreateCrudItemForm<Event, CreateOneInput>
-     routes={Routes.Events} 
-     useItems={useEvents}
-
-     schema={schema} 
-     defaultValues={defaultValues} 
-     onPostSubmit={onPostSubmit}
-     >
-      <Container sx={{ marginTop: 5 }}>
-        <Typography variant="h3" sx={{ marginBottom: 3 }}>
-          Create New Event
-        </Typography>
-        <Card sx={{ padding: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <RHFTextField name="title" label="Event Title" control={control} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <RHFTextField name="date" label="Event Date" type="date" control={control} InputLabelProps={{ shrink: true }} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <RHFTextField name="location" label="Location" control={control} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <RHFTextField name="maxParticipants" label="Max Participants" type="number" control={control} />
-            </Grid>
-            <Grid item xs={12}>
-              <RHFTextField name="description" label="Description" control={control} multiline rows={4} />
-            </Grid>
-            <Grid item xs={12}>
-              <InputLabel>Event Image</InputLabel>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => e.target.files && setValue('image', e.target.files[0])}
-              />
-            </Grid>
+      <CreateCrudItemForm<Event, CreateOneInput>
+        routes={Routes.Events}
+        useItems={useEvents}
+        schema={EventSchema}
+        defaultValues={defaultValues}
+        onPostSubmit={onPostSubmit}
+      >
+        <Grid container spacing={3} sx={{ padding: 6 }}>
+          <Grid item xs={6}>
+            <RHFTextField name="title" label="Titre de l'événement" />
           </Grid>
-          <Box sx={{ marginTop: 3 }}>
-            <Button variant="contained" color="primary" fullWidth onClick={handleSubmit(onPostSubmit)}>
-              Create Event
-            </Button>
-          </Box>
-        </Card>
-      </Container>
-    </CreateCrudItemForm>
+          <Grid item xs={6}>
+            <RHFTextField name="date" label="Date" type="datetime-local" InputLabelProps={{ shrink: true }} />
+          </Grid>
+          <Grid item xs={6}>
+            <RHFTextField name="location" label="Emplacement" />
+          </Grid>
+          <Grid item xs={6}>
+            <RHFTextField name="max_participants" label="Nombre max de participants" type="number" />
+          </Grid>
+          <Grid item xs={12}>
+            <RHFTextField name="description" label="Description" multiline rows={4} />
+          </Grid>
+          <Grid item xs={12}>
+            <input 
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </Grid>
+        </Grid>
+      </CreateCrudItemForm>
     </>
-
   );
 };
 
-export default CreateEvent;
+export default EventForm;

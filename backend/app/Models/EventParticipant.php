@@ -12,12 +12,19 @@ class EventParticipant extends Model
     protected $fillable = ['event_id', 'user_id'];
 
     public function event()
-    {
-        return $this->belongsTo(Event::class);
-    }
+{
+    return $this->belongsTo(\App\Models\Event::class, 'event_id');
+}
+
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function participants()
+{
+    return $this->hasMany(\App\Models\EventParticipant::class, 'event_id');
+}
+
 }

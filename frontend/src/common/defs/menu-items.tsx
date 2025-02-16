@@ -33,7 +33,10 @@ export const menuItems: NavGroup[] = [
             text: 'Create Event',
             icon: <Event />,
             link: Routes.Events.CreateOne,
-            permission: CRUD_ACTION.READ,
+            // permission: CRUD_ACTION.READ,
+            permission: CRUD_ACTION.CREATE,
+        routes: Routes.Events,
+
           },
           {
             text: 'Event Listing',
