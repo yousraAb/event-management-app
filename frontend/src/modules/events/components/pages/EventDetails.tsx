@@ -1,10 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, CardMedia, Grid, Button, Box } from '@mui/material';
+import { Container, Typography, Card, CardMedia, Grid, Button,Snackbar,Alert, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
-import useApi from '@common/hooks/useApi'; // assuming this is your custom hook to handle API calls
-// import { useAuth } from '@common/hooks/'; // custom hook to check if user is authenticated
+import useApi from '@common/hooks/useApi';
 import withAuth, { AUTH_MODE } from '@modules/auth/hocs/withAuth';
 import withPermissions from '@modules/permissions/hocs/withPermissions';
 import useAuth from '@modules/auth/hooks/api/useAuth';
@@ -28,9 +26,14 @@ interface EventDetailsProps {
 
 const EventDetails: React.FC<EventDetailsProps> = ({ item }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isJoined, setIsJoined] = useState<boolean>(false);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);  // Snackbar state
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');  // Snackbar message
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info'>('info');  // Snackbar severity
   const router = useRouter();
   const fetchApi = useApi();
-  const { user } = useAuth(); // assuming `useAuth` gives you user info if authenticated
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -40,29 +43,57 @@ const EventDetails: React.FC<EventDetailsProps> = ({ item }) => {
 
   const handleJoinEvent = async () => {
     if (!isAuthenticated) {
-      // If not authenticated, redirect to login page
       router.push(Routes.Auth.Login);
       return;
     }
 
+    if (isJoined) {
+      alert("You've already joined this event!");
+      return;
+    }
+
+    setLoading(true); 
     try {
-      // Assuming you have an API route for joining the event
-      const response = await fetchApi<{ success: boolean; message: string }>(`/api/events/${item?.id}/join`, {
+      const response = await fetchApi<{ success: boolean; message: string }>(`/events/${item?.id}/join`, {
         method: 'POST',
       });
 
       if (response.success) {
-        // Do something on successful join (e.g., show a success message, update participants count)
-        console.log('Successfully joined the event!');
+        setSnackbarMessage("You have successfully joined the event!");
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+
+        item.participants_count += 1;
+
+        setIsJoined(true); 
+        setLoading(false);  
+
+   
+        const notificationResponse = await fetchApi<{ success: boolean }>(`/events/${item?.id}/notify-host`, {
+          method: 'POST',
+        });
+
+        if (notificationResponse.success) {
+          console.log("Notification sent to host!");
+        }
       } else {
-        // Handle error (e.g., not enough spots, user already joined)
-        console.error(response.message);
+ 
+        setSnackbarMessage(response.message);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        setLoading(false); 
       }
     } catch (error) {
       console.error('Error joining the event', error);
+      setSnackbarMessage('There was an error joining the event. Please try again later.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      setLoading(false); 
     }
   };
-
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
   if (!item) {
     return <Typography variant="body1">Event data not found</Typography>;
   }
@@ -108,13 +139,22 @@ const EventDetails: React.FC<EventDetailsProps> = ({ item }) => {
               color="primary"
               fullWidth
               onClick={handleJoinEvent}
-              disabled={item.participants_count >= item.max_participants} // Disable button if max participants reached
+              disabled={item.participants_count >= item.max_participants || isJoined || loading}  // Disable if max participants or already joined
             >
-              Join this Event
+              {loading ? 'Joining...' : isJoined ? 'You have joined' : 'Join this Event'}
             </Button>
           </Card>
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

@@ -9,8 +9,8 @@ export interface CreateOneInput {
   location: string;
   max_participants: number;
   host_id: number;
-  description: string; // Add description property
-  image: string; // Add image property
+  description: string;
+  image: File | null; 
 }
 
 export interface UpdateOneInput {
@@ -20,8 +20,8 @@ export interface UpdateOneInput {
   location?: string;
   max_participants?: number;
   host_id?: number;
-  description?: string; // Add description property
-  image?: string; // Add image property
+  description?: string;
+  image?: File | null; 
 }
 
 export type UpsertOneInput = CreateOneInput | UpdateOneInput;

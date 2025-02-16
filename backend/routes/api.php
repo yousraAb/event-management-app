@@ -90,20 +90,27 @@ Route::prefix('events')->name('events.')->group(function () {
             Route::post('/', 'createOne');
             Route::put('/{id}', 'updateOne');
             Route::delete('/{id}', 'deleteOne');
-            Route::post('/{id}/join', 'joinEvent');
-            Route::delete('/{id}/leave', 'leaveEvent');
+            // Route::post('/{id}/join', 'joinEvent');
+            // Route::delete('/{id}/leave', 'leaveEvent');
         });
     });
 
+    // routes/api.php
 
-    Route::prefix('eventsparticipants')->name('eventsparticipants.')->group(function () {
-        Route::controller(EventParticipantController::class)->group(function () {
-            Route::get('/', 'index');
-            Route::post('/', 'store');
-            Route::get('/{id}', 'show');
-            Route::delete('/{id}', 'destroy');
-        });
-    });
+
+Route::post('/{id}/join', [EventParticipantController::class, 'joinEvent']);
+Route::post('/{id}/notify-host', [EventParticipantController::class, 'notifyHost']);
+Route::post('/{id}/leave', [EventParticipantController::class, 'leaveEvent']);
+
+
+    // Route::prefix('eventsparticipants')->name('eventsparticipants.')->group(function () {
+    //     Route::controller(EventParticipantController::class)->group(function () {
+    //         Route::get('/', 'index');
+    //         Route::post('/', 'store');
+    //         Route::get('/{id}', 'show');
+    //         Route::delete('/{id}', 'destroy');
+    //     });
+    // });
 });
 
 Route::get(

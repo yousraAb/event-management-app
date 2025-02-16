@@ -19,9 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->timestamp('joined_at')->useCurrent();
-            $table->enum('status', ['pending', 'confirmed'])->default('pending');
-            $table->softDeletes(); // Adds soft delete column
+            $table->softDeletes();
             $table->timestamps();
         });
     }
