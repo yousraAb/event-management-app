@@ -11,7 +11,7 @@ import Namespaces from '@common/defs/namespaces';
 import Labels from '@common/defs/labels';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'react-i18next';
-import withAuth, { AUTH_MODE } from '@modules/auth/hocs/withAuth'; // withAuth HOC for authentication
+import withAuth, { AUTH_MODE } from '@modules/auth/hocs/withAuth';
 
 const CreateEventPage: NextPage = () => {
   const router = useRouter();
@@ -20,37 +20,37 @@ const CreateEventPage: NextPage = () => {
   return (
     <>
       <PageHeader
-        title={t(`event:${Labels.Events.NewOne}`)} // Title for the page
+        title={t(`event:${Labels.Events.NewOne}`)} 
         action={{
           label: t(`event:${Labels.Events.NewOne}`),
-          startIcon: <Add />, // Add icon for creating event
-          onClick: () => router.push(Routes.Events.CreateOne), // Redirect to Create Event page
+          startIcon: <Add />, 
+          onClick: () => router.push(Routes.Events.CreateOne),
           permission: {
-            entity: Namespaces.Events, // Permissions check for creating an event
+            entity: Namespaces.Events, 
             action: CRUD_ACTION.CREATE,
           },
         }}
       />
       <CustomBreadcrumbs
         links={[
-          { name: t('common:dashboard'), href: Routes.Common.Home }, // Home breadcrumb
-          { name: t(`event:${Labels.Events.Items}`) }, // Events breadcrumb
+          { name: t('common:dashboard'), href: Routes.Common.Home }, 
+          { name: t(`event:${Labels.Events.Items}`) }, 
         ]}
       />
-      <CreateEventForm /> {/* Event listing component */}
+      <CreateEventForm />
     </>
   );
 };
 
-// Adding server-side translation support for internationalization (i18n)
+
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
     ...(await serverSideTranslations(locale, ['topbar', 'footer', 'leftbar', 'event', 'common'])),
   },
 });
 
-// Wrapping the CreateEventPage with withAuth HOC to check for authentication
+
 export default withAuth(CreateEventPage, {
-  mode: AUTH_MODE.LOGGED_IN, // Ensures the user is logged in
-  redirectUrl: Routes.Auth.Login, // Redirect URL for non-authenticated users
+  mode: AUTH_MODE.LOGGED_IN,
+  redirectUrl: Routes.Auth.Login,
 });

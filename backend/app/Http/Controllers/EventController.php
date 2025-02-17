@@ -31,84 +31,50 @@ class EventController extends Controller
     }
 
     public function createOne(Request $request)
-{
-    try {
-        // Validate the request
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string|max:255',
-            'max_participants' => 'required|integer|min:1',
-            'description' => 'nullable|string|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+    {
+        try {
+        
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'date' => 'required|date',
+                'location' => 'required|string|max:255',
+                'max_participants' => 'required|integer|min:1',
+                'description' => 'nullable|string|min:1',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        // Handle file upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('event_images', 'public');
-            $request->merge(['image' => $imagePath]);
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('event_images', 'public');
+                $request->merge(['image' => $imagePath]);
+            }
+
+            $request->merge(['host_id' => Auth::id()]);
+
+         
+            $event = Event::create([
+                'title' => $request->title,
+                'date' => $request->date,
+                'location' => $request->location,
+                'max_participants' => $request->max_participants,
+                'description' => $request->description,
+                'image' => $request->image, 
+                'host_id' => $request->host_id, 
+            ]);
+
+            
+            return response()->json([
+                'success' => true,
+                'data' => $event,
+            ], 201); 
+
+        } catch (\Exception $e) {
+            Log::error('Error in EventController.createOne: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+
+            return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]], 500);
         }
-
-        // Assign current user as host
-        $request->merge(['host_id' => Auth::id()]);
-
-        // Store the data in the database directly
-        $event = Event::create([
-            'title' => $request->title,
-            'date' => $request->date,
-            'location' => $request->location,
-            'max_participants' => $request->max_participants,
-            'description' => $request->description,
-            'image' => $request->image, // Can be null if not provided
-            'host_id' => $request->host_id, // Current user as host
-        ]);
-
-        // Return success response
-        return response()->json([
-            'success' => true,
-            'data' => $event,
-        ], 201); // 201 Created response
-
-    } catch (\Exception $e) {
-        Log::error('Error in EventController.createOne: ' . $e->getMessage());
-        Log::error($e->getTraceAsString());
-
-        return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]], 500);
     }
-}
 
-
-   
-    // public function createOne(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'title' => 'required|string|max:255',
-    //             'date' => 'required|date',
-    //             'location' => 'required|string|max:255',
-    //             'max_participants' => 'required|integer|min:1',
-    //             'description' => 'nullable|string|min:1',
-    //             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    //         ]);
-
-    //         // Handle file upload
-    //         if ($request->hasFile('image')) {
-    //             $imagePath = $request->file('image')->store('event_images', 'public');
-    //             $request->merge(['image' => $imagePath]);
-    //         }
-
-    //         // Assign current user as host
-    //         $request->merge(['host_id' => Auth::id()]);
-
-    //         return parent::createOne($request);
-    //         dd(parent::createOne($request));
-    //     } catch (\Exception $e) {
-    //         Log::error('Error in EventController.createOne: ' . $e->getMessage());
-    //         Log::error($e->getTraceAsString());
-
-    //         return response()->json(['success' => false, 'errors' => [__('common.unexpected_error')]], 500);
-    //     }
-    // }
 
     public function afterCreateOne($event, $request)
     {
@@ -187,7 +153,7 @@ class EventController extends Controller
             return response()->json(['success' => false, 'message' => 'Event not found'], 404);
         }
 
-        // Only the host can delete the event
+     
         if ($event->host_id !== Auth::id()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
@@ -199,5 +165,24 @@ class EventController extends Controller
         $event->delete();
 
         return response()->json(['success' => true, 'message' => 'Event deleted']);
+    }
+
+    public function eventCrud(Request $request, $action = null, $id = null)
+    {
+        switch ($action) {
+            case 'create':
+                return $this->createOne($request);
+
+            case 'update':
+                return $this->updateOne($id, $request);
+
+            case 'delete':
+                return $this->deleteOne($id, $request);
+
+            case 'read':
+            default:
+               
+                return $this->readAll($request);
+        }
     }
 }

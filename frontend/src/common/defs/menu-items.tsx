@@ -2,17 +2,17 @@ import Routes from '@common/defs/routes';
 import { CRUD_ACTION, NavGroup } from '@common/defs/types';
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded';
 import Namespaces from '@common/defs/namespaces';
-import { Group, Event } from '@mui/icons-material';
+import { Group, Event, Edit, List } from '@mui/icons-material';
 
 export const menuItems: NavGroup[] = [
   {
     text: 'Gestion',
     items: [
-      {
-        text: 'Dashboard',
-        icon: <DashboardCustomizeRoundedIcon />,
-        link: Routes.Common.Home,
-      },
+      // {
+      //   text: 'Dashboard',
+      //   icon: <DashboardCustomizeRoundedIcon />,
+      //   link: Routes.Common.Home,
+      // },
       {
         text: 'Users',
         icon: <Group />,
@@ -26,29 +26,28 @@ export const menuItems: NavGroup[] = [
         icon: <Event />,
         link: Routes.Events.ReadAll,
         namespace: Namespaces.Events,
-        // permission: CRUD_ACTION.READ,
         routes: Routes.Events,
         children: [
           {
             text: 'Create Event',
             icon: <Event />,
             link: Routes.Events.CreateOne,
-            // permission: CRUD_ACTION.READ,
             permission: CRUD_ACTION.CREATE,
-        routes: Routes.Events,
-
+            routes: Routes.Events,
+            
           },
           {
             text: 'Event Listing',
-            icon: <Event />,
-            link: Routes.Events.ReadAll,  // Ensure this route exists
+            icon: <List />,
+            link: Routes.Events.ReadAll,
           },
-          // {
-          //   text: 'Events Table',
-          //   icon: <Event />,
-          //   link: Routes.Events.ReadAll,  // Ensure this route exists
-          //   permission: CRUD_ACTION.READ,
-          // },
+          {
+            text: 'Event Management',
+            icon: <Edit />,
+            link: Routes.Events.UpdateOne,
+            routes: Routes.Events,
+            permission: CRUD_ACTION.UPDATE,
+          },
         ],
       },
     ],
