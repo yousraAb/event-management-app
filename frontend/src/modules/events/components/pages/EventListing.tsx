@@ -12,7 +12,7 @@ interface Event {
     title: string;
     date: string;
     location: string;
-    max_participants: number;
+    maxParticipants: number;
     participants_count: number;
     description: string;
     image: string;
@@ -92,19 +92,21 @@ const EventListing = () => {
                                 {event.description.length > 100 ? `${event.description.substring(0, 100)}...` : event.description}
                             </Typography>
 
+                            <Typography variant="body2" sx={{ marginTop: 1 }}>
+                                {event.maxParticipants}
+                            </Typography>
                             <Button
                                 variant="contained"
                                 color="primary"
                                 sx={{ marginTop: 2 }}
 
-                                // onClick={() => router.push(ApiRoutes.Events.ReadOne.replace('{id}', event.id.toString()))}
-                                // onClick={() => {
-                                //     const eventUrl = ApiRoutes.Events.ReadOne.replace('{id}', event.id.toString());
-                                //     router.push(eventUrl);
-                                // }}
                                 onClick={() => {
-                                    router.push(`/events/${event.id}`);
+                                    const eventUrl = ApiRoutes.Events.ReadOne.replace('{id}', event.id.toString());
+                                    router.push(eventUrl);
                                 }}
+                                // onClick={() => {
+                                //     router.push(`/events/${event.id}`);
+                                // }}
                             >
 
                                 {t('event:event_explore')}

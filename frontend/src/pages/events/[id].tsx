@@ -22,12 +22,11 @@ const EventIdPage: NextPage = () => {
     const router = useRouter();
     const { start, stop } = useProgressBar();
     const { readOne } = useEvents();
-    
+
     const [item, setItem] = useState<null | Event>(null);
     const [loading, setLoading] = useState(true);
     const id: Id = Number(router.query.id);
 
-    // const id = router.query.id ? Number(router.query.id) : null;
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation(['event', 'common']);
 
@@ -45,24 +44,21 @@ const EventIdPage: NextPage = () => {
         if (id) {
             setLoading(true);
             try {
-                const  data  = await readOne(id);
-                console.log('API Response:', data);
-                console.log('Query Params:', router);
-                console.log("Type of id:", typeof id);
+                const data = await readOne(id);
                 if (data?.event) {
-                  setItem(data.event);
-              } else {
-                  setError('Event not found');
-              }
-              
+                    setItem(data.event);
+                } else {
+                    setError('Event not found');
+                }
+
             } catch (error) {
                 setError('Failed to fetch event details');
             } finally {
-                setLoading(false); // Stop loading after fetching
+                setLoading(false);
             }
         }
     };
-    
+
     if (loading) return <CircularProgress sx={{ display: 'block', margin: 'auto', marginTop: 5 }} />;
     if (error) return <Typography variant="body1" color="error" sx={{ textAlign: 'center', marginTop: 5 }}>{error}</Typography>;
 
@@ -75,12 +71,12 @@ const EventIdPage: NextPage = () => {
                     { name: t('event:events'), href: Routes.Events.ReadAll },
                     {
                         name: item ? item.title : t('common:loading'),
-                        href: id ? `/events/${id}` : '#' // Ensure `id` is present
+                        href: id ? `/events/${id}` : '#'
                     },
                 ]}
             />
 
-{item ? <EventDetails item={item} /> : <Typography>Loading event details...</Typography>}
+            {item ? <EventDetails item={item} /> : <Typography>Loading event details...</Typography>}
 
         </>
     );
@@ -98,16 +94,3 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 
 export default EventIdPage;
 
-// export default withAuth(
-//   withPermissions(EventIdPage, {
-//     requiredPermissions: {
-//       entity: Namespaces.Events,
-//       action: CRUD_ACTION.UPDATE,
-//     },
-//     redirectUrl: Routes.Permissions.Forbidden,
-//   }),
-//   {
-//     mode: AUTH_MODE.LOGGED_IN,
-//     redirectUrl: Routes.Auth.Login,
-//   }
-// );

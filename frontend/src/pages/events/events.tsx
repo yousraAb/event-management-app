@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import EventListing from '@modules/events/components/pages/EventListing';
+import EventsTable  from '@modules/events/components/pages/EventsTable';
 import withAuth, { AUTH_MODE } from '@modules/auth/hocs/withAuth';
 import Routes from '@common/defs/routes';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -7,7 +7,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 const EventsPage: NextPage = () => {
   return (
     <>
-      <EventListing />
+      <EventsTable  />
     </>
   );
 };

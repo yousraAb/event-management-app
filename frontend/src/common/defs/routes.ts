@@ -2,7 +2,7 @@ import Auth from '@modules/auth/defs/routes';
 import Users from '@modules/users/defs/routes';
 import Uploads from '@modules/uploads/defs/api-routes';
 import Permissions from '@modules/permissions/defs/routes';
-import Events from '@modules/events/defs/routes'; // Import the events ApiRoutes
+import Events from '@modules/events/defs/routes';
 
 const Common = {
   Home: '/',
@@ -14,7 +14,7 @@ const Routes = {
   Auth,
   Permissions,
   Users,
-  Events, // Add the events routes here
+  Events,
   Uploads
 };
 

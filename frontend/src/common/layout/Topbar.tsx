@@ -14,10 +14,11 @@ import {
   ListItemText,
   Toolbar,
   styled,
+  Badge
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useAuth from '@modules/auth/hooks/api/useAuth';
 import Stack from '@mui/material/Stack';
 import Logo from '@common/assets/svgs/Logo';
@@ -25,6 +26,9 @@ import { ArrowForwardIos, Logout } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { setUserLanguage } from '@common/components/lib/utils/language';
+
+import NotificationsIcon from '@mui/icons-material/Notifications'; // Add the notification icon import
+import pusher from '@common/defs/pusher'; // Assuming Pusher setup
 
 interface TopbarItem {
   label: string;
@@ -45,11 +49,46 @@ const Topbar = () => {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const { user, logout } = useAuth();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [newNotificationsCount, setNewNotificationsCount] = useState(0);
 
   const dropdownWidth = 137;
   const toggleSidebar = () => {
     setShowDrawer((oldValue) => !oldValue);
   };
+
+  const toggleNotifications = () => {
+    setShowNotifications((prevState) => !prevState);
+    setNewNotificationsCount(0); // Reset unread notifications count when opened
+  };
+
+  // Subscribe to Pusher notifications
+  useEffect(() => {
+    const channel = pusher.subscribe('event.123'); // Example: Replace with actual event channel
+
+    // Listen for event notifications
+    channel.bind('event.joined', (data) => {
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        {
+          message: data.message,
+          event_title: data.event_title,
+          participants_count: data.participants_count,
+        },
+      ]);
+      setNewNotificationsCount((prevCount) => prevCount + 1); // Increment unread notification count
+    });
+    return () => {
+      pusher.unsubscribe('event.123'); // Unsubscribe when component unmounts
+    };
+  }, []);
+
+  const handleNotificationClick = (notification: any) => {
+    // You can add more logic here, for example, navigating to the event details page
+    router.push(`/event/${notification.event_title}`);
+  };
+
   const navItems: TopbarItem[] = [
     {
       label: t('topbar:home'),
@@ -61,26 +100,26 @@ const Topbar = () => {
       link: Routes.Events.ReadAll,
       onClick: () => router.push(Routes.Events.ReadAll),
     },
-    {
-      label: t('topbar:language'),
-      dropdown: [
-        {
-          label: t('topbar:language_french'),
-          link: asPath,
-          value: 'fr',
-        },
-        {
-          label: t('topbar:language_english'),
-          link: `${asPath}`,
-          value: 'en',
-        },
-        {
-          label: t('topbar:language_spanish'),
-          link: `${asPath}`,
-          value: 'es',
-        },
-      ],
-    },
+    // {
+    //   label: t('topbar:language'),
+    //   dropdown: [
+    //     {
+    //       label: t('topbar:language_french'),
+    //       link: asPath,
+    //       value: 'fr',
+    //     },
+    //     {
+    //       label: t('topbar:language_english'),
+    //       link: `${asPath}`,
+    //       value: 'en',
+    //     },
+    //     {
+    //       label: t('topbar:language_spanish'),
+    //       link: `${asPath}`,
+    //       value: 'es',
+    //     },
+    //   ],
+    // },
     {
       label: 'Utilisateur',
       dropdown: [
@@ -156,6 +195,8 @@ const Topbar = () => {
               sx={{ cursor: 'pointer' }}
             />
           </Stack>
+        
+                
           <List sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
             <>
               {navItems.map((item, index) => {
@@ -315,6 +356,42 @@ const Topbar = () => {
               </>
             ) : (
               <>
+      
+              <ListItem sx={{ width: 'fit-content' }}>
+                <StyledListItemButton onClick={toggleNotifications}>
+                  <Badge
+                    color="error"
+                    badgeContent={newNotificationsCount}
+                    invisible={newNotificationsCount === 0}
+                  >
+                    <NotificationsIcon />
+                  </Badge>
+                </StyledListItemButton>
+
+                {showNotifications && (
+                  <List
+                    sx={{
+                      position: 'absolute',
+                      top: 48,
+                      right: 0,
+                      backgroundColor: 'common.white',
+                      boxShadow: (theme) => theme.customShadows.z12,
+                      width: 250,
+                      padding: 0,
+                      borderRadius: 8,
+                      zIndex: 10000,
+                    }}
+                  >
+                    <ListItem sx={{ padding: 0 }}>
+                    <ListItemButton sx={{ color: 'primary.main' }}>
+                      {/* Example notification content */}
+                      You have new notification
+                    </ListItemButton>
+                  </ListItem>
+                  </List>
+                )}
+              </ListItem>
+          {/*  */}
                 <ListItem
                   key="user-options"
                   sx={{
@@ -406,6 +483,9 @@ const Topbar = () => {
               </>
             )}
           </List>
+
+            {/*  */}
+            
           <IconButton
             onClick={() => toggleSidebar()}
             sx={{

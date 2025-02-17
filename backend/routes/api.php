@@ -26,7 +26,8 @@ Route::prefix('auth')->name('auth.')->group(
                 Route::post('/request-password-reset', 'requestPasswordReset');
                 Route::post('/reset-password', 'resetPassword');
                 Route::get(
-                    '/disconnected', function () {
+                    '/disconnected',
+                    function () {
                         return response()->json(['success' => false, 'errors' => [__('auth.disconnected')]]);
                     }
                 );
@@ -84,37 +85,32 @@ Route::prefix('events')->name('events.')->group(function () {
         // Public route for reading all events
         Route::get('/', 'readAll');
         Route::get('/{id}', 'readOne');
-        
+
         // Authenticated routes
         Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/', 'createOne');
             Route::put('/{id}', 'updateOne');
             Route::delete('/{id}', 'deleteOne');
-            // Route::post('/{id}/join', 'joinEvent');
-            // Route::delete('/{id}/leave', 'leaveEvent');
+            Route::get('/event', 'eventCrud');
+
+            // Route to display the CRUD page (likely with a table of events)
+            Route::get('/event', 'eventCrud')->name('crud'); 
+
         });
     });
-
-    // routes/api.php
-
-
-Route::post('/{id}/join', [EventParticipantController::class, 'joinEvent']);
-Route::post('/{id}/notify-host', [EventParticipantController::class, 'notifyHost']);
-Route::post('/{id}/leave', [EventParticipantController::class, 'leaveEvent']);
-
-
-    // Route::prefix('eventsparticipants')->name('eventsparticipants.')->group(function () {
-    //     Route::controller(EventParticipantController::class)->group(function () {
-    //         Route::get('/', 'index');
-    //         Route::post('/', 'store');
-    //         Route::get('/{id}', 'show');
-    //         Route::delete('/{id}', 'destroy');
-    //     });
-    // });
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/events/{id}/join', [EventParticipantController::class, 'joinEvent']);
+    Route::post('/events/{id}/notify-host', [EventParticipantController::class, 'notifyHost']);
+    Route::get('/events/{id}/is-joined', [EventParticipantController::class, 'checkIfJoined']);
+});
+Route::delete('/events/{id}/leave', [EventParticipantController::class, 'leaveEvent']);
+
+
 Route::get(
-    '/hello', function () {
+    '/hello',
+    function () {
         return response()->json(['success' => true, 'data' => ['message' => 'Hello World!']]);
     }
 );
@@ -132,13 +128,15 @@ Route::prefix('uploads')->name('uploads.')->group(
 Route::prefix('cloud')->name('cloud.')->group(
     function () {
         Route::get(
-            '/{path}', function () {
+            '/{path}',
+            function () {
                 $path = request()->path;
                 if (! Storage::disk('cloud')->exists($path)) {
                     return response()->json(
                         [
                             'message' => 'File not found',
-                        ], 404
+                        ],
+                        404
                     );
                 }
 
@@ -153,7 +151,8 @@ if (config('app.debug')) {
         function () {
             // Route that display cache content in json format. Url parameter "cache key" is required (:key).
             Route::get(
-                '/cache/{key}', function ($key) {
+                '/cache/{key}',
+                function ($key) {
                     $cacheData = Cache::get($key);
                     $success = $cacheData !== null;
 
@@ -166,7 +165,8 @@ if (config('app.debug')) {
                 }
             );
             Route::get(
-                '/routes-logs', function () {
+                '/routes-logs',
+                function () {
                     // Récupérer les logs agrégés par route
                     $routesData = DB::table('routes_logs')
                         ->select('route', DB::raw('SUM(duration) as total_duration'), DB::raw('COUNT(*) as request_count'))

@@ -48,7 +48,3 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 });
 
 export default EventsPage;
-// export default withAuth(EventsPage, {
-//   mode: AUTH_MODE.LOGGED_IN,
-//   redirectUrl: Routes.Auth.Login,
-// });

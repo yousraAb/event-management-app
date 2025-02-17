@@ -1,7 +1,6 @@
 import { CrudAppRoutes } from '@common/defs/types';
 
-
-const prefix = '/events';
+const prefix = '/notifications';
 
 const Routes: CrudAppRoutes = {
   ReadAll: prefix,
@@ -9,7 +8,6 @@ const Routes: CrudAppRoutes = {
   CreateOne: prefix + '/create',
   UpdateOne: prefix + '/{id}',
   DeleteOne: prefix + '/{id}',
-  Crud: prefix + '/event',  
 };
 
 export default Routes;
